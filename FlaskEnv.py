@@ -29,13 +29,13 @@ class FlaskEnv:
             command = self.commad_other
         try:
             os.system(f"mkdir {self.dir_path}")
-            os.system(f"{command} -m pip install virtualenv flask")
+            os.system(f"{command} -m pip install virtualenv")
             os.system(f"{command} -m virtualenv {self.dir_path}")
             self.__file_creator(self.dir_path, 'main.py', content=main_string)
+            self.__file_creator(self.dir_path, 'requirements.txt', content=requirements)
+            self.__file_creator(self.dir_path, '.gitignore', content=gitignore_string)
             for project_dir in self.dir_names:
                 self.__dirs_creator(project_dir)
-        
-            self.__copier()
             
         
         except FileExistsError:
@@ -43,35 +43,19 @@ class FlaskEnv:
 
         except Exception as e:
             print(f'Somethig wrong. Try one more time. Error - {str(e)}')
-        
-        finally:
-            os.system('pip freeze > requirements.txt')
-            os.system('pip uninstall -r requirements.txt -y')
-
-    # copy installed packages
-    def __copier(self):
-        path_target = os.path.join(self.dir_path, 'Lib', 'site-packages')
-        path_source = os.path.join(os.getcwd(), 'Lib', 'site-packages')
-        list_targer = os.listdir(path_target)
-        list_source = os.listdir(path_source)
-        for package in list_source:
-            if (package not in list_targer) and (package.find("virtualenv") == -1):
-                try:
-                    shutil.copytree(os.path.join(path_source, package), os.path.join(path_target, package))
-                except:
-                    shutil.copy(os.path.join(path_source, package), os.path.join(path_target, package))
-                print(f'Package {package} copied')
 
     # creates an empty file
     def __file_creator(self, file_path: str, file_name: str, content: str = None):
-        with open(os.path.join(file_path, file_name), 'w', encoding='utf8') as f: 
+        path_to_file = os.path.join(file_path, file_name)
+        with open(path_to_file, 'w', encoding='utf8') as f: 
             if content is None:
                 pass
             else:
                 f.writelines(content)
+        print(path_to_file, ' ctreated')
 
     # creates an directory
-    def __dirs_creator(self, name: str, addtional_name: str = None, create_main: bool = False):
+    def __dirs_creator(self, name: str, addtional_name: str = None):
         file_path = ''
             
         if addtional_name:
@@ -80,9 +64,6 @@ class FlaskEnv:
         else:
             file_path = os.path.join(self.dir_path, name)
             os.mkdir(file_path)
-
-        if create_main:
-            self.__file_creator(file_path, 'main.py', content=main_string)
 
         self.__file_creator(file_path, '__init__.py')
 
