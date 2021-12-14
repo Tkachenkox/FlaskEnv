@@ -12,8 +12,6 @@ class FlaskEnv:
             self.dir_path = dir_path
         else:
             self.dir_path = os.path.join(os.getcwd(), "TestProj")
-        self.path_python = os.path.join(self.dir_path, 'Scripts', 'python.exe')
-        self.activation =  os.path.join(self.dir_path, 'Scripts', 'activate_this.py')
         self.commad_nt = 'py'
         self.commad_other = 'python3'
 
@@ -31,9 +29,7 @@ class FlaskEnv:
             os.system(f"mkdir {self.dir_path}")
             os.system(f"{command} -m pip install virtualenv")
             os.system(f"{command} -m virtualenv {self.dir_path}")
-            self.__file_creator(self.dir_path, 'main.py', content=main_string)
-            self.__file_creator(self.dir_path, 'requirements.txt', content=requirements)
-            self.__file_creator(self.dir_path, '.gitignore', content=gitignore_string)
+            self.__main_copier()
             for project_dir in self.dir_names:
                 self.__dirs_creator(project_dir)
             
@@ -43,6 +39,15 @@ class FlaskEnv:
 
         except Exception as e:
             print(f'Somethig wrong. Try one more time. Error - {str(e)}')
+
+    
+    def __main_copier(self):
+        base_path = os.path.join(os.getcwd(), 'samples')
+        shutil.copy(os.path.join(base_path, 'main.py'), self.dir_path)
+        shutil.copy(os.path.join(base_path, 'config.py'), self.dir_path)
+        shutil.copy(os.path.join(base_path, 'requirements.txt'), self.dir_path)
+        shutil.copy(os.path.join(os.getcwd(), ".gitignore"), self.dir_path)
+        print('Created root files')
 
     # creates an empty file
     def __file_creator(self, file_path: str, file_name: str, content: str = None):
